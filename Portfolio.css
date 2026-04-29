@@ -60,6 +60,31 @@ body{
    z-index: 1000;
 
 }
+.brand {
+  display: flex;
+  align-items: center; /* vertically align logo and text */
+  gap: 15px; /* space between logo and name */
+}
+
+.site-logo {
+  height: 200px; /* make it bigger */
+  width: auto;
+  filter: drop-shadow(0 0 12px orange); /* glowing effect */
+  transition: transform 0.3s ease;
+}
+
+.site-logo:hover {
+  transform: scale(1.1);
+}
+
+.site-name {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 0 10px orange;
+}
+
+
 #navigation-bar ul{
     list-style: none;
     margin: 0;
