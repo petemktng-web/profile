@@ -1,4 +1,54 @@
 document.addEventListener("DOMContentLoaded", () => {
+  /* --- Time-based visitor greeting --- */
+  const greetingElement = document.getElementById("time-greeting");
+  if (greetingElement) {
+    const now = new Date();
+    const hour = now.getHours();
+    let greetingText = "Welcome";
+
+    if (hour >= 5 && hour < 12) {
+      greetingText = "Good morning";
+    } else if (hour >= 12 && hour < 17) {
+      greetingText = "Good afternoon";
+    } else if (hour >= 17 && hour < 21) {
+      greetingText = "Good evening";
+    } else {
+      greetingText = "Working late?";
+    }
+
+    greetingElement.textContent = `${greetingText}! Thanks for visiting my portfolio.`;
+    greetingElement.style.opacity = "1";
+  }
+
+  /* --- Digital Clocks --- */
+  const phTimeEl = document.getElementById("ph-time");
+  const localTimeEl = document.getElementById("local-time");
+  const localZoneEl = document.getElementById("local-zone");
+  const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Local";
+
+  if (localZoneEl) {
+    localZoneEl.textContent = userTimeZone;
+  }
+
+  function formatTime(date, timeZone) {
+    return new Intl.DateTimeFormat("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+      timeZone,
+    }).format(date);
+  }
+
+  function updateClocks() {
+    const now = new Date();
+    if (phTimeEl) phTimeEl.textContent = formatTime(now, "Asia/Manila");
+    if (localTimeEl) localTimeEl.textContent = formatTime(now, userTimeZone);
+  }
+
+  updateClocks();
+  setInterval(updateClocks, 1000);
+
   /* --- Soft Skills Scroller --- */
   const skillsList = document.querySelector(".soft-skills-list");
   if (skillsList) {
@@ -23,33 +73,39 @@ document.addEventListener("DOMContentLoaded", () => {
     card.addEventListener("click", () => card.classList.toggle("flipped"));
   });
 
-  /* --- Carousel --- */
-  const track = document.querySelector(".carousel-track");
-  if (track) {
-    const cards = Array.from(track.children);
-    const prevButton = document.querySelector(".prev");
-    const nextButton = document.querySelector(".next");
-    let currentIndex = 0;
+  /* --- Card Shuffle --- */
+  const shuffleContainers = document.querySelectorAll(".skills-grid, .previous-roles-cards");
+  if (shuffleContainers.length) {
+    const shuffleArray = items => {
+      for (let i = items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+      }
+      return items;
+    };
 
-    function updateCarousel() {
-      const cardWidth = cards[0].getBoundingClientRect().width;
-      track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
-    }
+    shuffleContainers.forEach(container => {
+      const cards = Array.from(container.children);
+      const shuffled = shuffleArray(cards);
+      shuffled.forEach(card => {
+        card.style.opacity = "0";
+        card.style.transform = "translateY(20px)";
+      });
 
-    nextButton.addEventListener("click", () => {
-      currentIndex = (currentIndex + 1) % cards.length;
-      updateCarousel();
+      requestAnimationFrame(() => {
+        shuffled.forEach((card, index) => {
+          container.appendChild(card);
+          card.style.transition = "transform 0.35s ease, opacity 0.35s ease";
+          card.style.transitionDelay = `${index * 40}ms`;
+          card.style.opacity = "1";
+          card.style.transform = "translateY(0)";
+          setTimeout(() => {
+            card.style.transition = "";
+            card.style.transitionDelay = "";
+          }, 500);
+        });
+      });
     });
-
-    prevButton.addEventListener("click", () => {
-      currentIndex = (currentIndex - 1 + cards.length) % cards.length;
-      updateCarousel();
-    });
-
-    setInterval(() => {
-      currentIndex = (currentIndex + 1) % cards.length;
-      updateCarousel();
-    }, 5000);
   }
 
   /* --- Contact Explosions --- */
